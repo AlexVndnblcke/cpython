@@ -37,6 +37,8 @@ def cmp(f1, f2, shallow=True):
     f2 -- Second file name
 
     shallow -- Just check stat signature (do not read the files).
+               The signature is made based on the file its: mode,
+               size and mtime.
                defaults to True.
 
     Return value:
