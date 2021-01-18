@@ -42,6 +42,10 @@ class FileCompareTestCase(unittest.TestCase):
         self.assertTrue(filecmp.cmp(self.name, self.name_same, shallow=False),
                         "Comparing file to identical file fails")
 
+    def test_shallow_compare(self):
+        os.utime(self.name_same, (1610997901, 1610997901))
+        self.assertFalse(filecmp.cmp(self.name, self.name_same))
+
     def test_different(self):
         # Despite the fact that the file is different, it should
         # be detected as equal since only a shallow copy is
