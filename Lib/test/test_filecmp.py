@@ -14,12 +14,17 @@ class FileCompareTestCase(unittest.TestCase):
         self.name_same = os_helper.TESTFN + '-same'
         self.name_diff = os_helper.TESTFN + '-diff'
         data = 'Contents of file go here.\n'
-        for name in [self.name, self.name_same, self.name_diff]:
+        # Keep in mind that the assumption is made
+        # that the files have the same mtime here.
+        for name in [self.name, self.name_same]:
             with open(name, 'w') as output:
                 output.write(data)
+        with open(self.name_diff, 'w') as output:
+            # Make a single char diff (i.e. the size
+            # of the file remains identical).
+            diff_data = data[:-2] + '!\n'
+            output.write(diff_data)
 
-        with open(self.name_diff, 'a+') as output:
-            output.write('An extra line.\n')
         self.dir = tempfile.gettempdir()
 
     def tearDown(self):
@@ -38,7 +43,14 @@ class FileCompareTestCase(unittest.TestCase):
                         "Comparing file to identical file fails")
 
     def test_different(self):
-        self.assertFalse(filecmp.cmp(self.name, self.name_diff),
+        # Despite the fact that the file is different, it should
+        # be detected as equal since only a shallow copy is
+        # performed.
+        self.assertTrue(
+            filecmp.cmp(self.name, self.name_diff, shallow=True),
+            "Mismatched files compare as different with shallow compare"
+        )
+        self.assertFalse(filecmp.cmp(self.name, self.name_diff, shallow=False),
                     "Mismatched files compare as equal")
         self.assertFalse(filecmp.cmp(self.name, self.dir),
                     "File and directory compare as equal")
