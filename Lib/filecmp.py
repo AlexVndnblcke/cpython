@@ -55,11 +55,11 @@ def cmp(f1, f2, shallow=True):
     s2 = _sig(os.stat(f2))
     if s1[0] != stat.S_IFREG or s2[0] != stat.S_IFREG:
         return False
-    if shallow and s1 == s2:
-        return True
+    if shallow:
+        return s1 == s2
+
     if s1[1] != s2[1]:
         return False
-
     outcome = _cache.get((f1, f2, s1, s2))
     if outcome is None:
         outcome = _do_cmp(f1, f2)
